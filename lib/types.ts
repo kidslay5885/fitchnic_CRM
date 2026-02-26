@@ -78,20 +78,7 @@ export interface NewLectureForm {
   isNew: boolean;
   newInstructor: string;
   lectureName: string;
-  type: string;
-  tone: string;
-  platform: string;
-  usps: string[];
-  proof: string[];
-  target: string;
-  story: string;
-  ebook: string;
-  freeUrl: string;
-  youtubeUrl: string;
-  payUrl: string;
-  ebookUrl: string;
   liveDate: string;
-  liveTime: string;
 }
 
 export type TabId = "dashboard" | "board" | "history";

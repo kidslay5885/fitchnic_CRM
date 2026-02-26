@@ -164,14 +164,25 @@ export default function BoardTab() {
               </span>
               {!editInfo && <span>📅 {fmtDateKr(ld.liveDate)} {ld.liveTime}</span>}
             </div>
-            <button
-              onClick={() => setEditInfo(!editInfo)}
-              className={`px-4 py-2 rounded-lg text-[13px] font-semibold cursor-pointer border-none ${
-                editInfo ? "bg-red-50 text-red-500" : "bg-primary/10 text-primary"
-              }`}
-            >
-              {editInfo ? "✕ 닫기" : "✏️ 정보 수정"}
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  dispatch({ type: "COMPLETE_LECTURE", ins: state.ins, lec: state.lec });
+                  dispatch({ type: "SET_TAB", tab: "dashboard" });
+                }}
+                className="px-4 py-2 rounded-lg text-[13px] font-semibold cursor-pointer border-none bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+              >
+                ✅ 완료 처리
+              </button>
+              <button
+                onClick={() => setEditInfo(!editInfo)}
+                className={`px-4 py-2 rounded-lg text-[13px] font-semibold cursor-pointer border-none ${
+                  editInfo ? "bg-red-50 text-red-500" : "bg-primary/10 text-primary"
+                }`}
+              >
+                {editInfo ? "✕ 닫기" : "✏️ 정보 수정"}
+              </button>
+            </div>
           </div>
           {editInfo && <div className="mt-3.5"><LectureInfoEditor /></div>}
         </div>

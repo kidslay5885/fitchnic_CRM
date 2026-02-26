@@ -265,11 +265,16 @@ export const NEW_LECTURE_INIT: import("./types").NewLectureForm = {
   isNew: false,
   newInstructor: "",
   lectureName: "",
+  liveDate: "",
+};
+
+/** 새 강의 추가 시 Lecture 기본값 (폼에서 안 쓰이는 필드) */
+export const NEW_LECTURE_DEFAULTS: Omit<Lecture, "liveDate" | "status"> = {
   type: "",
   tone: "",
   platform: "핏크닉",
-  usps: ["", "", ""],
-  proof: ["", ""],
+  usps: [],
+  proof: [],
   target: "",
   story: "",
   ebook: "",
@@ -277,6 +282,5 @@ export const NEW_LECTURE_INIT: import("./types").NewLectureForm = {
   youtubeUrl: "",
   payUrl: "",
   ebookUrl: "",
-  liveDate: "",
   liveTime: "19:30",
 };

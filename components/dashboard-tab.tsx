@@ -33,6 +33,35 @@ export default function DashboardTab() {
     }, 0);
   };
 
+  const completeLecture = (e: React.MouseEvent, ins: string, lec: string) => {
+    e.stopPropagation();
+    dispatch({ type: "COMPLETE_LECTURE", ins, lec });
+  };
+
+  /* 최근 완료 강의 (7일 이내) */
+  const recentCompleted = useMemo(() => {
+    const result: { ins: string; lec: string; liveDate: string; color: string; checkedCount: number; copiedCount: number; totalItems: number }[] = [];
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    Object.entries(state.data).forEach(([iN, iD]) => {
+      Object.entries(iD.lectures)
+        .filter(([, l]) => l.status === "completed" && l.liveDate)
+        .forEach(([lN, lD]) => {
+          const live = new Date(lD.liveDate);
+          if (live >= sevenDaysAgo) {
+            const ck = state.allChecks[`${iN}|${lN}`] || {};
+            const cp = state.allCopies[`${iN}|${lN}`] || {};
+            const totalItems = DEFAULT_SEQ.reduce((s, q) => s + q.items.length, 0);
+            const checkedCount = DEFAULT_SEQ.reduce((s, q) => s + q.items.filter((it) => ck[it.id]).length, 0);
+            const copiedCount = Object.keys(cp).length;
+            result.push({ ins: iN, lec: lN, liveDate: lD.liveDate, color: iD.color, checkedCount, copiedCount, totalItems });
+          }
+        });
+    });
+    result.sort((a, b) => new Date(b.liveDate).getTime() - new Date(a.liveDate).getTime());
+    return result.slice(0, 3);
+  }, [state.data, state.allChecks, state.allCopies]);
+
   const calendarEvents = useMemo<CalendarEvent[]>(() => {
     const ev: CalendarEvent[] = [];
     Object.entries(state.data).forEach(([iN, iD]) => {
@@ -77,13 +106,18 @@ export default function DashboardTab() {
     return days;
   }, [calMonth]);
 
+  const activeCount = Object.values(state.data).reduce(
+    (s, iD) => s + Object.values(iD.lectures).filter((l) => l.status === "active").length,
+    0
+  );
+
   return (
     <div className="p-7 max-w-[1300px] mx-auto animate-fi">
       <div className="grid gap-6 items-start" style={{ gridTemplateColumns: "340px 1fr" }}>
-        {/* 좌측: 진행중 강의 */}
+        {/* 좌측: 진행중 + 최근 완료 */}
         <div>
           <div className="flex items-center justify-between mb-3.5">
-            <h3 className="text-lg font-extrabold">진행중</h3>
+            <h3 className="text-lg font-extrabold">진행중 ({activeCount})</h3>
             <button
               onClick={() => setShowAdd(true)}
               className="bg-gradient-to-br from-primary to-[#764ba2] text-white rounded-lg px-3.5 py-1.5 text-[13px] font-semibold border-none cursor-pointer hover:opacity-90 transition-opacity"
@@ -161,11 +195,61 @@ export default function DashboardTab() {
                           <div className="text-[11px] text-emerald-600 font-bold mt-0.5">🎉 CRM 준비 완료!</div>
                         )}
                       </div>
+
+                      {/* 완료 처리 버튼 */}
+                      <button
+                        onClick={(e) => completeLecture(e, iN, lN)}
+                        className="mt-2.5 w-full bg-[#f8f8fa] border border-border rounded-lg text-[13px] text-muted-foreground font-semibold py-1.5 cursor-pointer hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition-colors"
+                      >
+                        완료 처리
+                      </button>
                     </div>
                   );
                 })
             )}
+            {activeCount === 0 && (
+              <div className="text-center text-[#aeaeb2] text-sm py-8">
+                진행중인 강의가 없습니다
+              </div>
+            )}
           </div>
+
+          {/* 최근 완료 섹션 */}
+          {recentCompleted.length > 0 && (
+            <div className="mt-6">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex-1 h-px bg-border" />
+              </div>
+              <h4 className="text-[15px] font-extrabold text-muted-foreground mb-2.5">최근 완료</h4>
+              <div className="flex flex-col gap-1.5">
+                {recentCompleted.map((r) => (
+                  <div
+                    key={`${r.ins}|${r.lec}`}
+                    onClick={() => goToBoard(r.ins, r.lec)}
+                    className="bg-[#f8f8fa] border border-border rounded-xl px-4 py-3 cursor-pointer transition-all hover:shadow-sm"
+                    style={{ borderLeft: `4px solid ${r.color}40` }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <span className="text-[14px] font-bold" style={{ color: r.color }}>{r.ins}</span>
+                        <span className="text-[13px] text-muted-foreground ml-1.5">{r.lec}</span>
+                      </div>
+                      <span className="text-[12px] text-emerald-600 font-bold">
+                        ✅ {r.checkedCount}/{r.totalItems}
+                      </span>
+                    </div>
+                    <div className="text-[12px] text-[#aeaeb2] mt-0.5">📅 {fmtDateKr(r.liveDate)}</div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => dispatch({ type: "SET_TAB", tab: "history" })}
+                className="mt-2.5 w-full text-[13px] text-primary font-semibold py-2 rounded-lg bg-primary/5 border border-primary/20 cursor-pointer hover:bg-primary/10 transition-colors"
+              >
+                전체 히스토리 보기 →
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 우측: 캘린더 */}

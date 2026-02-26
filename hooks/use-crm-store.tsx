@@ -59,7 +59,8 @@ type Action =
   | { type: "SET_CHECK"; curKey: string; itemId: string; checked: boolean }
   | { type: "SET_COPY"; curKey: string; itemId: string; copy: { text: string; edited: string; status: "ai" | "edited" } }
   | { type: "UPDATE_SEQ"; curKey: string; seq: SeqPhase[] }
-  | { type: "ADD_FEEDBACK"; feedback: Feedback };
+  | { type: "ADD_FEEDBACK"; feedback: Feedback }
+  | { type: "COMPLETE_LECTURE"; ins: string; lec: string };
 
 function reducer(state: CrmState, action: Action): CrmState {
   switch (action.type) {
@@ -127,6 +128,16 @@ function reducer(state: CrmState, action: Action): CrmState {
       };
     case "ADD_FEEDBACK":
       return { ...state, feedbacks: [...state.feedbacks, action.feedback] };
+    case "COMPLETE_LECTURE": {
+      const d = { ...state.data };
+      if (!d[action.ins]?.lectures?.[action.lec]) return state;
+      d[action.ins] = { ...d[action.ins], lectures: { ...d[action.ins].lectures } };
+      d[action.ins].lectures[action.lec] = {
+        ...d[action.ins].lectures[action.lec],
+        status: "completed",
+      };
+      return { ...state, data: d };
+    }
     default:
       return state;
   }
@@ -152,6 +163,25 @@ export function CrmProvider({ children }: { children: ReactNode }) {
     const fb = storage.loadFeedbacks() || [];
     dispatch({ type: "HYDRATE", data: d, checks: c, copies: cp, seqDataMap: sm, feedbacks: fb });
   }, []);
+
+  // Auto-complete lectures past D+2
+  useEffect(() => {
+    if (!state.hydrated) return;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    Object.entries(state.data).forEach(([ins, iD]) => {
+      Object.entries(iD.lectures).forEach(([lec, lD]) => {
+        if (lD.status !== "active" || !lD.liveDate) return;
+        const live = new Date(lD.liveDate);
+        live.setHours(0, 0, 0, 0);
+        const diff = (now.getTime() - live.getTime()) / (1000 * 60 * 60 * 24);
+        if (diff >= 2) {
+          dispatch({ type: "COMPLETE_LECTURE", ins, lec });
+        }
+      });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.hydrated]);
 
   // Auto-save to localStorage
   useEffect(() => {
