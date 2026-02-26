@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useCrm } from "@/hooks/use-crm-store";
 import { DEFAULT_SEQ } from "@/lib/constants";
 import { addDays, fmtDate, fmtDateKr, isSameDay } from "@/lib/utils";
+import AddLectureDialog from "./add-lecture-dialog";
 import type { CalendarEvent } from "@/lib/types";
 
 export default function DashboardTab() {
@@ -11,6 +12,7 @@ export default function DashboardTab() {
   const today = new Date();
   const [calMonth, setCalMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
 
   const goToBoard = (iN: string, lN: string, seqId?: string) => {
     dispatch({ type: "SELECT_INSTRUCTOR", ins: iN });
@@ -80,7 +82,15 @@ export default function DashboardTab() {
       <div className="grid gap-6 items-start" style={{ gridTemplateColumns: "340px 1fr" }}>
         {/* 좌측: 진행중 강의 */}
         <div>
-          <h3 className="text-lg font-extrabold mb-3.5">진행중</h3>
+          <div className="flex items-center justify-between mb-3.5">
+            <h3 className="text-lg font-extrabold">진행중</h3>
+            <button
+              onClick={() => setShowAdd(true)}
+              className="bg-gradient-to-br from-primary to-[#764ba2] text-white rounded-lg px-3.5 py-1.5 text-[13px] font-semibold border-none cursor-pointer hover:opacity-90 transition-opacity"
+            >
+              + 새 강의
+            </button>
+          </div>
           <div className="flex flex-col gap-2">
             {Object.entries(state.data).flatMap(([iN, iD]) =>
               Object.entries(iD.lectures)
@@ -321,6 +331,7 @@ export default function DashboardTab() {
           </div>
         </div>
       </div>
+      {showAdd && <AddLectureDialog onClose={() => setShowAdd(false)} />}
     </div>
   );
 }
