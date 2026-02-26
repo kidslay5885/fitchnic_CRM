@@ -1,4 +1,10 @@
-import type { CrmData, SeqPhase, ChOption, ChRule } from "./types";
+import type { CrmData, SeqPhase, ChOption, ChRule, Lecture } from "./types";
+
+function daysFromNow(offset: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 export const COLORS = [
   "#667eea", "#e67e22", "#e74c3c", "#2ecc71", "#9b59b6",
@@ -20,113 +26,117 @@ export const TYPE_PRESETS = [
   "상세페이지", "유튜브(롱폼)", "유튜브(숏폼)", "블로그/SNS", "디지털마케팅",
 ];
 
-export const INIT_DATA: CrmData = {
-  셀링남: {
-    color: "#667eea",
-    lectures: {
-      "브랜드파이프 4기": {
-        type: "이커머스(브랜드)", tone: "열정+전문가형", platform: "머니업",
-        usps: ["마진율 50% 비밀링크 소싱", "AI 자동 소싱+엑셀정리", "상품등록 후 바로 다음날 수익"],
-        proof: ["시작 한달만에 5천만원 매출", "수강생 한달 평균수익 3천만원"],
-        target: "직장인/왕초보/부업", story: "11년차 직장인→상위1% 셀러",
-        ebook: "마진계산기 등 BIG5 자료", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2026-03-05", liveTime: "19:30", status: "active",
-      },
-      "브랜드파이프 3기": {
-        type: "이커머스(브랜드)", tone: "열정+전문가형", platform: "머니업",
-        usps: ["마진율 50%", "AI 소싱", "다음날 수익"],
-        proof: ["5천만원 매출", "평균 3천만원"],
-        target: "직장인/왕초보", story: "11년차→상위1%",
-        ebook: "BIG5 자료", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2026-01-14", liveTime: "19:30", status: "completed",
-      },
-      "로켓그로스 8기": {
-        type: "이커머스(로켓)", tone: "열정+전문가형", platform: "머니업",
-        usps: ["로켓그로스 AI 수익화", "무재고 쿠팡 판매", "월급 이상 수익"],
-        proof: ["직원0명 월급이상", "다수 수익화 성공"],
-        target: "직장인/쿠팡", story: "14년차 셀러 노하우",
-        ebook: "로켓그로스 가이드북", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2025-12-10", liveTime: "19:30", status: "completed",
-      },
-    },
-  },
-  파이: {
-    color: "#e67e22",
-    lectures: {
-      "AI 대량등록 3기": {
-        type: "쇼핑몰(대량등록)", tone: "친근+실전형", platform: "핏크닉",
-        usps: ["무재고 월300 AI 대량등록", "데이터기반 AI 상품분석", "2주만에 수익"],
-        proof: ["연매출 50억", "초년생/주부/장애인 성공"],
-        target: "주부/초보/무자본", story: "연매출 50억 사업가",
-        ebook: "대량등록 바이블", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2026-03-03", liveTime: "19:30", status: "active",
+export function createInitData(): CrmData {
+  return {
+    셀링남: {
+      color: "#667eea",
+      lectures: {
+        "브랜드파이프 4기": {
+          type: "이커머스(브랜드)", tone: "열정+전문가형", platform: "머니업",
+          usps: ["마진율 50% 비밀링크 소싱", "AI 자동 소싱+엑셀정리", "상품등록 후 바로 다음날 수익"],
+          proof: ["시작 한달만에 5천만원 매출", "수강생 한달 평균수익 3천만원"],
+          target: "직장인/왕초보/부업", story: "11년차 직장인→상위1% 셀러",
+          ebook: "마진계산기 등 BIG5 자료", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(7), liveTime: "19:30", status: "active",
+        },
+        "브랜드파이프 3기": {
+          type: "이커머스(브랜드)", tone: "열정+전문가형", platform: "머니업",
+          usps: ["마진율 50%", "AI 소싱", "다음날 수익"],
+          proof: ["5천만원 매출", "평균 3천만원"],
+          target: "직장인/왕초보", story: "11년차→상위1%",
+          ebook: "BIG5 자료", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(-45), liveTime: "19:30", status: "completed",
+        },
+        "로켓그로스 8기": {
+          type: "이커머스(로켓)", tone: "열정+전문가형", platform: "머니업",
+          usps: ["로켓그로스 AI 수익화", "무재고 쿠팡 판매", "월급 이상 수익"],
+          proof: ["직원0명 월급이상", "다수 수익화 성공"],
+          target: "직장인/쿠팡", story: "14년차 셀러 노하우",
+          ebook: "로켓그로스 가이드북", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(-90), liveTime: "19:30", status: "completed",
+        },
       },
     },
-  },
-  디선제압: {
-    color: "#e74c3c",
-    lectures: {
-      "상세페이지 7기": {
-        type: "상세페이지", tone: "도전+자신감형", platform: "핏크닉",
-        usps: ["무자본 AI 상세페이지", "건당 100만원 AI+템플릿", "비전공자도 시작"],
-        proof: ["25억 기업이 찾는 디자이너", "영디자이너 20인"],
-        target: "비전공자/초보/부업", story: "실패→월1000 수익화",
-        ebook: "수익화 전자책(30만원)", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2026-03-07", liveTime: "19:30", status: "active",
-      },
-      "상세페이지 6기": {
-        type: "상세페이지", tone: "도전+자신감형", platform: "핏크닉",
-        usps: ["무자본 AI 상세페이지", "건당 100만원", "비전공자"],
-        proof: ["25억 기업", "영디자이너 20인"],
-        target: "비전공자/초보", story: "실패→월1000",
-        ebook: "수익화 전자책", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2026-01-06", liveTime: "19:30", status: "completed",
+    파이: {
+      color: "#e67e22",
+      lectures: {
+        "AI 대량등록 3기": {
+          type: "쇼핑몰(대량등록)", tone: "친근+실전형", platform: "핏크닉",
+          usps: ["무재고 월300 AI 대량등록", "데이터기반 AI 상품분석", "2주만에 수익"],
+          proof: ["연매출 50억", "초년생/주부/장애인 성공"],
+          target: "주부/초보/무자본", story: "연매출 50억 사업가",
+          ebook: "대량등록 바이블", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(5), liveTime: "19:30", status: "active",
+        },
       },
     },
-  },
-  지인옥: {
-    color: "#2ecc71",
-    lectures: {
-      "유튜브 롱폼 2기": {
-        type: "유튜브(롱폼)", tone: "시니어친화+진정성", platform: "핏크닉",
-        usps: ["60대도 월600 AI 유튜브", "인생 연금", "3개월 월600"],
-        proof: ["60대 3개월 월600", "전자책 2종"],
-        target: "시니어/50~60대", story: "60대 유튜브 전문가",
-        ebook: "AI유튜브 활용서 2종", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2026-03-10", liveTime: "19:30", status: "active",
-      },
-      "유튜브 롱폼 1기": {
-        type: "유튜브(롱폼)", tone: "시니어친화+진정성", platform: "핏크닉",
-        usps: ["60대도 월600", "인생 연금", "3개월 월600"],
-        proof: ["60대 월600", "전자책 2종"],
-        target: "시니어/50~60대", story: "60대 유튜브 전문가",
-        ebook: "AI유튜브 활용서", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2026-02-01", liveTime: "19:30", status: "completed",
-      },
-    },
-  },
-  셀팜: {
-    color: "#1abc9c",
-    lectures: {
-      "AI 숏폼 1기": {
-        type: "유튜브(숏폼)", tone: "실전+친근형", platform: "핏크닉",
-        usps: ["AI 숏폼 자동화", "하루 30분 수익", "무편집 숏폼"],
-        proof: ["누적매출 66억", "수강생 3000명"],
-        target: "초보/부업/시니어", story: "66억 셀러의 AI 숏폼",
-        ebook: "AI 숏폼 가이드북", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2026-03-12", liveTime: "19:30", status: "active",
-      },
-      "쿠팡 농수산물 6기": {
-        type: "이커머스(쿠팡)", tone: "실전+친근형", platform: "핏크닉",
-        usps: ["AI 쿠팡 농수산물", "3일 500만원", "리뷰없이 매출"],
-        proof: ["누적매출 66억", "3000명 검증"],
-        target: "초보/부업", story: "66억 셀러의 쿠팡",
-        ebook: "쿠팡 비법 전자책", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
-        liveDate: "2025-11-06", liveTime: "19:30", status: "completed",
+    디선제압: {
+      color: "#e74c3c",
+      lectures: {
+        "상세페이지 7기": {
+          type: "상세페이지", tone: "도전+자신감형", platform: "핏크닉",
+          usps: ["무자본 AI 상세페이지", "건당 100만원 AI+템플릿", "비전공자도 시작"],
+          proof: ["25억 기업이 찾는 디자이너", "영디자이너 20인"],
+          target: "비전공자/초보/부업", story: "실패→월1000 수익화",
+          ebook: "수익화 전자책(30만원)", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(10), liveTime: "19:30", status: "active",
+        },
+        "상세페이지 6기": {
+          type: "상세페이지", tone: "도전+자신감형", platform: "핏크닉",
+          usps: ["무자본 AI 상세페이지", "건당 100만원", "비전공자"],
+          proof: ["25억 기업", "영디자이너 20인"],
+          target: "비전공자/초보", story: "실패→월1000",
+          ebook: "수익화 전자책", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(-55), liveTime: "19:30", status: "completed",
+        },
       },
     },
-  },
-};
+    지인옥: {
+      color: "#2ecc71",
+      lectures: {
+        "유튜브 롱폼 2기": {
+          type: "유튜브(롱폼)", tone: "시니어친화+진정성", platform: "핏크닉",
+          usps: ["60대도 월600 AI 유튜브", "인생 연금", "3개월 월600"],
+          proof: ["60대 3개월 월600", "전자책 2종"],
+          target: "시니어/50~60대", story: "60대 유튜브 전문가",
+          ebook: "AI유튜브 활용서 2종", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(12), liveTime: "19:30", status: "active",
+        },
+        "유튜브 롱폼 1기": {
+          type: "유튜브(롱폼)", tone: "시니어친화+진정성", platform: "핏크닉",
+          usps: ["60대도 월600", "인생 연금", "3개월 월600"],
+          proof: ["60대 월600", "전자책 2종"],
+          target: "시니어/50~60대", story: "60대 유튜브 전문가",
+          ebook: "AI유튜브 활용서", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(-30), liveTime: "19:30", status: "completed",
+        },
+      },
+    },
+    셀팜: {
+      color: "#1abc9c",
+      lectures: {
+        "AI 숏폼 1기": {
+          type: "유튜브(숏폼)", tone: "실전+친근형", platform: "핏크닉",
+          usps: ["AI 숏폼 자동화", "하루 30분 수익", "무편집 숏폼"],
+          proof: ["누적매출 66억", "수강생 3000명"],
+          target: "초보/부업/시니어", story: "66억 셀러의 AI 숏폼",
+          ebook: "AI 숏폼 가이드북", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(14), liveTime: "19:30", status: "active",
+        },
+        "쿠팡 농수산물 6기": {
+          type: "이커머스(쿠팡)", tone: "실전+친근형", platform: "핏크닉",
+          usps: ["AI 쿠팡 농수산물", "3일 500만원", "리뷰없이 매출"],
+          proof: ["누적매출 66억", "3000명 검증"],
+          target: "초보/부업", story: "66억 셀러의 쿠팡",
+          ebook: "쿠팡 비법 전자책", freeUrl: "", youtubeUrl: "", payUrl: "", ebookUrl: "",
+          liveDate: daysFromNow(-120), liveTime: "19:30", status: "completed",
+        },
+      },
+    },
+  };
+}
+
+export const INIT_DATA: CrmData = createInitData();
 
 export const DEFAULT_SEQ: SeqPhase[] = [
   { id: "d7", label: "D-7", dayOffset: -7, items: [
