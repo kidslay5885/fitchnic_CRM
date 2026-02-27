@@ -234,9 +234,20 @@ export default function DashboardTab() {
                         <span className="text-[14px] font-bold" style={{ color: r.color }}>{r.ins}</span>
                         <span className="text-[13px] text-muted-foreground ml-1.5">{r.lec}</span>
                       </div>
-                      <span className="text-[12px] text-emerald-600 font-bold">
-                        ✅ {r.checkedCount}/{r.totalItems}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch({ type: "REACTIVATE_LECTURE", ins: r.ins, lec: r.lec });
+                          }}
+                          className="text-[11px] text-primary font-semibold px-2 py-0.5 rounded-md bg-primary/10 border-none cursor-pointer hover:bg-primary/20 transition-colors"
+                        >
+                          다시 진행
+                        </button>
+                        <span className="text-[12px] text-emerald-600 font-bold">
+                          ✅ {r.checkedCount}/{r.totalItems}
+                        </span>
+                      </div>
                     </div>
                     <div className="text-[12px] text-[#aeaeb2] mt-0.5">📅 {fmtDateKr(r.liveDate)}</div>
                   </div>

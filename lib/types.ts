@@ -75,8 +75,6 @@ export interface CalendarEvent {
 
 export interface NewLectureForm {
   instructor: string;
-  isNew: boolean;
-  newInstructor: string;
   lectureName: string;
   liveDate: string;
 }

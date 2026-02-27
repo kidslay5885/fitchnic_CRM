@@ -60,7 +60,9 @@ type Action =
   | { type: "SET_COPY"; curKey: string; itemId: string; copy: { text: string; edited: string; status: "ai" | "edited" } }
   | { type: "UPDATE_SEQ"; curKey: string; seq: SeqPhase[] }
   | { type: "ADD_FEEDBACK"; feedback: Feedback }
-  | { type: "COMPLETE_LECTURE"; ins: string; lec: string };
+  | { type: "COMPLETE_LECTURE"; ins: string; lec: string }
+  | { type: "REACTIVATE_LECTURE"; ins: string; lec: string }
+  | { type: "RENAME_LECTURE"; ins: string; oldLec: string; newLec: string };
 
 function reducer(state: CrmState, action: Action): CrmState {
   switch (action.type) {
@@ -137,6 +139,49 @@ function reducer(state: CrmState, action: Action): CrmState {
         status: "completed",
       };
       return { ...state, data: d };
+    }
+    case "REACTIVATE_LECTURE": {
+      const d = { ...state.data };
+      if (!d[action.ins]?.lectures?.[action.lec]) return state;
+      d[action.ins] = { ...d[action.ins], lectures: { ...d[action.ins].lectures } };
+      d[action.ins].lectures[action.lec] = {
+        ...d[action.ins].lectures[action.lec],
+        status: "active",
+      };
+      return { ...state, data: d, ins: action.ins, lec: action.lec, tab: "board" };
+    }
+    case "RENAME_LECTURE": {
+      const { ins, oldLec, newLec } = action;
+      if (!newLec.trim() || oldLec === newLec) return state;
+      if (!state.data[ins]?.lectures?.[oldLec]) return state;
+      if (state.data[ins].lectures[newLec]) return state; // 이미 존재하면 무시
+
+      const d = { ...state.data };
+      d[ins] = { ...d[ins], lectures: { ...d[ins].lectures } };
+      d[ins].lectures[newLec] = d[ins].lectures[oldLec];
+      delete d[ins].lectures[newLec]; // re-add properly
+      const { [oldLec]: lecData, ...rest } = d[ins].lectures;
+      d[ins].lectures = { ...rest, [newLec]: lecData };
+
+      // curKey 마이그레이션
+      const oldKey = `${ins}|${oldLec}`;
+      const newKey = `${ins}|${newLec}`;
+      const newChecks = { ...state.allChecks };
+      const newCopies = { ...state.allCopies };
+      const newSeqMap = { ...state.seqDataMap };
+
+      if (newChecks[oldKey]) { newChecks[newKey] = newChecks[oldKey]; delete newChecks[oldKey]; }
+      if (newCopies[oldKey]) { newCopies[newKey] = newCopies[oldKey]; delete newCopies[oldKey]; }
+      if (newSeqMap[oldKey]) { newSeqMap[newKey] = newSeqMap[oldKey]; delete newSeqMap[oldKey]; }
+
+      return {
+        ...state,
+        data: d,
+        allChecks: newChecks,
+        allCopies: newCopies,
+        seqDataMap: newSeqMap,
+        lec: state.lec === oldLec && state.ins === ins ? newLec : state.lec,
+      };
     }
     default:
       return state;

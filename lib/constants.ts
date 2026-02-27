@@ -262,8 +262,6 @@ export const FEEDBACK_TAGS = ["톤 조정", "소구점 변경", "길이 조정",
 
 export const NEW_LECTURE_INIT: import("./types").NewLectureForm = {
   instructor: "",
-  isNew: false,
-  newInstructor: "",
   lectureName: "",
   liveDate: "",
 };

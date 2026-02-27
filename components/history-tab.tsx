@@ -5,7 +5,7 @@ import { DEFAULT_SEQ } from "@/lib/constants";
 import { fmtDateKr } from "@/lib/utils";
 
 export default function HistoryTab() {
-  const { state } = useCrm();
+  const { state, dispatch } = useCrm();
   const goToBoard = useGoToBoard();
 
   return (
@@ -43,6 +43,12 @@ export default function HistoryTab() {
                     </div>
                     <div className="flex items-center gap-2.5">
                       <span className="text-[13px] text-[#aeaeb2]">📅 {fmtDateKr(lD.liveDate)}</span>
+                      <button
+                        onClick={() => dispatch({ type: "REACTIVATE_LECTURE", ins: iN, lec: lN })}
+                        className="bg-amber-50 text-amber-600 border border-amber-200 rounded-lg px-3 py-1.5 text-[12px] font-semibold cursor-pointer hover:bg-amber-100 transition-colors"
+                      >
+                        다시 진행
+                      </button>
                       <button
                         onClick={() => goToBoard(iN, lN)}
                         className="bg-primary/10 text-primary border border-primary/20 rounded-lg px-3 py-1.5 text-[12px] font-semibold cursor-pointer hover:bg-primary/15 transition-colors"
